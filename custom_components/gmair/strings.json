@@ -1,0 +1,60 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "menu_options": {
+          "password": "账号密码登录",
+          "sms": "手机验证码登录"
+        }
+      },
+      "password": {
+        "title": "账号密码登录",
+        "description": "输入果麦账号（手机号）和密码，登录后自动添加账号下所有新风机。",
+        "data": {
+          "username": "账号（手机号）",
+          "password": "密码"
+        }
+      },
+      "sms": {
+        "title": "手机验证码登录",
+        "description": "输入手机号并提交，果麦会向该号码发送短信验证码。",
+        "data": {
+          "username": "手机号"
+        }
+      },
+      "sms_code": {
+        "title": "输入验证码",
+        "description": "验证码已发送至 {phone}，请在 5 分钟内输入。",
+        "data": {
+          "code": "验证码"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "账号或密码错误",
+      "invalid_code": "验证码错误或已过期",
+      "code_request_failed": "验证码发送失败，请确认手机号是否正确",
+      "cannot_connect": "无法连接果麦云服务",
+      "no_devices": "该账号下没有设备",
+      "unknown": "未知错误"
+    },
+    "abort": {
+      "already_configured": "该账号已经添加过了",
+      "reauth_successful": "重新登录成功"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "果麦新风设置",
+        "description": "选择空气质量数据（城市 / AQI / 室外 PM2.5）所用的城市。设备未绑定城市时默认为北京 / 东城。",
+        "data": {
+          "city_id": "城市"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "无法连接果麦云服务，无法获取城市列表"
+    }
+  }
+}

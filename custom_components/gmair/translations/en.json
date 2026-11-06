@@ -1,0 +1,60 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "menu_options": {
+          "password": "Sign in with password",
+          "sms": "Sign in with SMS code"
+        }
+      },
+      "password": {
+        "title": "Sign in with password",
+        "description": "Enter your GMAIR account (phone number) and password. All fresh air machines in the account will be added automatically.",
+        "data": {
+          "username": "Account (phone number)",
+          "password": "Password"
+        }
+      },
+      "sms": {
+        "title": "Sign in with SMS code",
+        "description": "Enter your phone number and submit, GMAIR will send you a verification code by SMS.",
+        "data": {
+          "username": "Phone number"
+        }
+      },
+      "sms_code": {
+        "title": "Enter verification code",
+        "description": "A verification code has been sent to {phone}, enter it within 5 minutes.",
+        "data": {
+          "code": "Verification code"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid username or password",
+      "invalid_code": "Invalid or expired verification code",
+      "code_request_failed": "Failed to send verification code, check the phone number",
+      "cannot_connect": "Unable to reach GMAIR cloud",
+      "no_devices": "No device found in this account",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This account is already configured",
+      "reauth_successful": "Re-authentication successful"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "GMAIR options",
+        "description": "Select the city used for air quality data (city / AQI / outdoor PM2.5). Defaults to Beijing / Dongcheng when the device has no bound city.",
+        "data": {
+          "city_id": "City"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to reach GMAIR cloud to load the city list"
+    }
+  }
+}
