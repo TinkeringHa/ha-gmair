@@ -45,13 +45,19 @@ class GmairApi:
     def __init__(self, session: aiohttp.ClientSession) -> None:
         self._session = session
         self._token: str | None = None
+        self._refresh_token: str | None = None
 
     @property
     def token(self) -> str | None:
         return self._token
 
-    def set_token(self, token: str | None) -> None:
+    @property
+    def refresh_token(self) -> str | None:
+        return self._refresh_token
+
+    def set_tokens(self, token: str | None, refresh_token: str | None = None) -> None:
         self._token = token
+        self._refresh_token = refresh_token
 
     async def _async_request(
         self, method: str, path: str, payload: dict[str, Any] | None = None
@@ -132,6 +138,38 @@ class GmairApi:
         if not token:
             raise GmairAuthError("login response without access_token")
         self._token = token
+        self._refresh_token = data.get("refresh_token")
+        return token
+
+    async def async_refresh(self) -> str | None:
+        if not self._refresh_token:
+            raise GmairAuthError("no refresh token available")
+        payload = {
+            "grant_type": "refresh_token",
+            "refresh_token": self._refresh_token,
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+        }
+        try:
+            async with self._session.post(
+                API_BASE + TOKEN_PATH, data=payload, headers=HEADERS, timeout=TIMEOUT
+            ) as resp:
+                status = resp.status
+                body = await resp.text()
+                data = await resp.json(content_type=None) if status == 200 else None
+        except aiohttp.ClientError as err:
+            raise GmairError(f"token refresh request error: {err}") from err
+        except asyncio.TimeoutError as err:
+            raise GmairError("token refresh request timeout") from err
+
+        if status in AUTH_STATUS_CODES or status != 200 or data is None:
+            raise GmairAuthError(f"token refresh failed: HTTP {status} {body[:160]}")
+
+        token = data.get("access_token")
+        if not token:
+            raise GmairAuthError("refresh response without access_token")
+        self._token = token
+        self._refresh_token = data.get("refresh_token") or self._refresh_token
         return token
 
     async def async_request_code(self, phone: str) -> None:

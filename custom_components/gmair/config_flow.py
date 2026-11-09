@@ -27,6 +27,7 @@ from .const import (
     CONF_CITY_ID,
     CONF_CODE,
     CONF_PASSWORD,
+    CONF_REFRESH_TOKEN,
     CONF_TOKEN,
     CONF_USERNAME,
     DEFAULT_CITY_ID,
@@ -199,6 +200,7 @@ class GmairConfigFlow(ConfigFlow, domain=DOMAIN):
                             {
                                 CONF_USERNAME: self._username,
                                 CONF_TOKEN: token,
+                                CONF_REFRESH_TOKEN: api.refresh_token,
                                 CONF_AUTH_METHOD: AUTH_SMS,
                             }
                         )

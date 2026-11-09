@@ -31,6 +31,7 @@ CONF_PASSWORD = "password"
 CONF_CODE = "code"
 CONF_AUTH_METHOD = "auth_method"
 CONF_TOKEN = "token"
+CONF_REFRESH_TOKEN = "refresh_token"
 CONF_CITY_ID = "city_id"
 
 AUTH_PASSWORD = "password_auth"

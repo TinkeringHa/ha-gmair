@@ -15,6 +15,7 @@ from .const import (
     CONF_AUTH_METHOD,
     CONF_CITY_ID,
     CONF_PASSWORD,
+    CONF_REFRESH_TOKEN,
     CONF_TOKEN,
     CONF_USERNAME,
     DEFAULT_CITY_ID,
@@ -36,7 +37,7 @@ async def _async_authenticate(hass: HomeAssistant, entry: ConfigEntry) -> GmairA
         token = entry.data.get(CONF_TOKEN)
         if not token:
             raise ConfigEntryAuthFailed("missing access token, reauth required")
-        api.set_token(token)
+        api.set_tokens(token, entry.data.get(CONF_REFRESH_TOKEN))
         return api
 
     if CONF_PASSWORD not in entry.data:
@@ -51,8 +52,23 @@ async def _async_authenticate(hass: HomeAssistant, entry: ConfigEntry) -> GmairA
     return api
 
 
+def _async_persist_tokens(
+    hass: HomeAssistant, entry: ConfigEntry, api: GmairApi
+) -> None:
+    new_data: dict[str, str] = {}
+    if api.token and api.token != entry.data.get(CONF_TOKEN):
+        new_data[CONF_TOKEN] = api.token
+    if api.refresh_token and api.refresh_token != entry.data.get(CONF_REFRESH_TOKEN):
+        new_data[CONF_REFRESH_TOKEN] = api.refresh_token
+    if new_data:
+        hass.config_entries.async_update_entry(
+            entry, data={**entry.data, **new_data}
+        )
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     api = await _async_authenticate(hass, entry)
+    _async_persist_tokens(hass, entry, api)
 
     try:
         machines = await api.async_get_machines()
@@ -74,7 +90,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         except GmairError as err:
             _LOGGER.debug("city id for %s failed: %s", machines[0]["codeValue"], err)
 
-    coordinator = GmairCoordinator(hass, api, machines, city_id)
+    coordinator = GmairCoordinator(hass, entry, api, machines, city_id)
     await coordinator.async_config_entry_first_refresh()
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
