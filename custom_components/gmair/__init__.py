@@ -35,9 +35,17 @@ async def _async_authenticate(hass: HomeAssistant, entry: ConfigEntry) -> GmairA
 
     if method == AUTH_SMS:
         token = entry.data.get(CONF_TOKEN)
-        if not token:
-            raise ConfigEntryAuthFailed("missing access token, reauth required")
-        api.set_tokens(token, entry.data.get(CONF_REFRESH_TOKEN))
+        refresh_token = entry.data.get(CONF_REFRESH_TOKEN)
+        if not token and not refresh_token:
+            raise ConfigEntryAuthFailed("missing credentials, reauth required")
+        api.set_tokens(token, refresh_token)
+        if refresh_token:
+            try:
+                await api.async_refresh()
+            except GmairAuthError as err:
+                raise ConfigEntryAuthFailed(str(err)) from err
+            except GmairError as err:
+                raise ConfigEntryNotReady(str(err)) from err
         return api
 
     if CONF_PASSWORD not in entry.data:
